@@ -195,15 +195,15 @@ def systems(system: str):
         data = json.loads(response.text)
         if data["data"] != None:
             print(f"""
-            name: {data["data"]["name"]}
-            code: {data["data"]["code"]}
-            type: {data["data"]["type"]}
+                   name: {data["data"]["name"]}
+                   code: {data["data"]["code"]}
+                   type: {data["data"]["type"]}
             affiliation: {data["data"]["affiliation"][0]["name"]}
             description:
                 {data["data"]["description"]}
-            x: {data["data"]["position_x"]}
-            y: {data["data"]["position_y"]}      
-            z: {data["data"]["position_z"]}
+                      x: {data["data"]["position_x"]}
+                      y: {data["data"]["position_y"]}      
+                      z: {data["data"]["position_z"]}
                   """)
         else:
             print(f"{Fore.YELLOW}Star system {system} does not exist.")
@@ -212,9 +212,43 @@ def systems(system: str):
         print(f"{Fore.RED}API Error: {response.status_code}")
 
 
+@starmap_app.command(help="Get information about an object.")
+def object(code: str):
+    response = requests.get(url + f"cache/starmap/object?code={code}")
+    if response.status_code == 200:
+        data = json.loads(response.text)
+        if data["data"] != None:
+            print(f"""
+                   name: {data["data"]["name"]}
+                   code: {data["data"]["code"]}
+            designation: {data["data"]["designation"]}
+                   type: {data["data"]["subtype"]["name"]}
+            affiliation: {data["data"]["affiliation"][0]["name"]}
+            description: 
+                {data["data"]["description"]}""")
+            if data["data"]["children"] != None:
+                i = 0
+                for x in data["data"]["children"]:
+                    print(f"""
+                   name: {data["data"]["children"][i]["name"]}
+                   code: {data["data"]["children"][i]["code"]}              
+                          """)
+
+                    i = i + 1
+
+            else:
+                quit(10)
+
+        else:
+            print(f"{Fore.YELLOW}Object {object} not existing.")
+
+    else:
+        print(f"{Fore.RED}API Error: {response.status_code}")
+
+
 @starmap_app.command(help="Search for an object in the Starmap.")
 def search(query):
-    response = requests.get(url + f"live/starmap/search?name={query}")
+    response = requests.get(url + f"cache/starmap/search?name={query}")
     if response.status_code == 200:
         data = json.loads(response.text)
         if data["data"] != None:
